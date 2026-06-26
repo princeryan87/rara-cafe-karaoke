@@ -1,0 +1,30 @@
+name: rara_cafe_karaoke
+description: RaRa Cafe Karaoke - Aplikasi Karaoke untuk Android & Android TV
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # WebView untuk tampilkan YouTube
+  webview_flutter: ^4.4.2
+  webview_flutter_android: ^3.12.1
+  # Deteksi platform (TV vs HP)
+  device_info_plus: ^9.1.2
+  # Fullscreen & status bar control
+  flutter_statusbarcolor_ns: ^0.2.3
+  # Wakelock agar layar tidak mati saat karaoke
+  wakelock_plus: ^1.1.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/logo.png
