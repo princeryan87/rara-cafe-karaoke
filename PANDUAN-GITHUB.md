@@ -178,4 +178,4 @@ Jika ingin update tampilan/fitur:
 
 ---
 
-*RaRa Cafe Karaoke © 2025 — Flutter + GitHub Actions*
+*RaRa Cafe Karaoke © 2025 — Flutter + GitHub Actions* versi baru
