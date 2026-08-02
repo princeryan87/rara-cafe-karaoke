@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import '../config.dart';
 
 class KaraokeScreen extends StatefulWidget {
   final String url;
@@ -14,8 +15,8 @@ class _KaraokeScreenState extends State<KaraokeScreen> {
   late final WebViewController _controller;
   bool _isLoading = true;
 
-  static const orange = Color(0xFFE85D00);
-  static const dark = Color(0xFF111111);
+  static const orange = AppConfig.orange;
+  static const dark = AppConfig.dark;
 
   @override
   void initState() {
@@ -68,7 +69,7 @@ class _KaraokeScreenState extends State<KaraokeScreen> {
                 const SizedBox(width: 12),
 
                 // Label RaRa Cafe
-                const Text('RaRa Cafe Karaoke',
+                Text(AppConfig.fullTitle,
                   style: TextStyle(
                     color: orange,
                     fontWeight: FontWeight.w800,

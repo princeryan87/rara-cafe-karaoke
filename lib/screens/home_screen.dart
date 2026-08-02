@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../config.dart';
 import 'karaoke_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,13 +15,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late AnimationController _glowController;
   late Animation<double> _glowAnimation;
 
-  // Warna tema
-  static const orange = Color(0xFFE85D00);
-  static const orangeLight = Color(0xFFFF8C00);
-  static const gold = Color(0xFFC2A06A);
-  static const dark = Color(0xFF111111);
-  static const darkCard = Color(0xFF1A1A1A);
-  static const darkOrange = Color(0xFF1C0800);
+  // Warna tema -- sumbernya dari config.dart, JANGAN edit di sini.
+  // Ganti branding/warna lewat lib/config.dart.
+  static const orange = AppConfig.orange;
+  static const orangeLight = AppConfig.orangeLight;
+  static const gold = AppConfig.gold;
+  static const dark = AppConfig.dark;
+  static const darkCard = AppConfig.darkCard;
+  static const darkOrange = AppConfig.darkOrange;
 
   final List<Map<String, String>> _quickButtons = [
     {'label': '🔥 Karaoke Populer', 'url': 'https://www.youtube.com/results?search_query=karaoke+indonesia+terbaik+2024'},
@@ -199,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: Image.asset('assets/logo.png',
+                child: Image.asset(AppConfig.logoAssetPath,
                   width: isTV ? 48 : 38,
                   height: isTV ? 48 : 38,
                   fit: BoxFit.cover,
@@ -211,14 +213,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('RaRa Cafe',
+                  Text(AppConfig.brandName,
                     style: TextStyle(
                       color: orange,
                       fontSize: isTV ? 16 : 14,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.5,
                     )),
-                  Text('KARAOKE',
+                  Text(AppConfig.subBrand.toUpperCase(),
                     style: TextStyle(
                       color: gold,
                       fontSize: isTV ? 10 : 9,
@@ -359,7 +361,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ],
               ),
               child: ClipOval(
-                child: Image.asset('assets/logo.png',
+                child: Image.asset(AppConfig.logoAssetPath,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
                     color: darkOrange,
@@ -375,7 +377,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               text: TextSpan(
                 children: [
                   TextSpan(
-                    text: 'RaRa Cafe\n',
+                    text: '${AppConfig.brandName}\n',
                     style: TextStyle(
                       color: orange,
                       fontSize: isTV ? 40 : 32,
@@ -385,7 +387,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                   ),
                   TextSpan(
-                    text: 'Karaoke',
+                    text: AppConfig.subBrand,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: isTV ? 36 : 28,
@@ -407,7 +409,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ),
             const SizedBox(height: 10),
-            Text('✦ Nyanyikan Hati Anda ✦',
+            Text(AppConfig.tagline,
               style: TextStyle(
                 color: gold,
                 fontSize: isTV ? 14 : 12,

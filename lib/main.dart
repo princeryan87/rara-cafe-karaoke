@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'config.dart';
 import 'screens/home_screen.dart';
 
 void main() async {
@@ -27,15 +28,15 @@ class RaraCafeKaraokeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'RaRa Cafe Karaoke',
+      title: AppConfig.fullTitle,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: const ColorScheme.dark(
-          primary: Color(0xFFE85D00),
-          secondary: Color(0xFFC2A06A),
-          surface: Color(0xFF111111),
+          primary: AppConfig.orange,
+          secondary: AppConfig.gold,
+          surface: AppConfig.dark,
         ),
-        scaffoldBackgroundColor: const Color(0xFF111111),
+        scaffoldBackgroundColor: AppConfig.dark,
         fontFamily: 'Roboto',
       ),
       home: const HomeScreen(),

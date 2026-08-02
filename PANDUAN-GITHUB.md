@@ -67,10 +67,13 @@ rara-cafe-karaoke/
 │   ├── build.gradle
 │   ├── gradle.properties
 │   └── settings.gradle
-├── assets/
-│   └── logo.png          ← PENTING! Copy dari logo Windows
+├── logo.png                  ← PENTING! Ganti untuk branding baru
+├── icon.ico                  ← opsional, buat referensi (bukan dipakai build Android)
+├── tool/
+│   └── generate_icon_source.py
 ├── lib/
 │   ├── main.dart
+│   ├── config.dart           ← EDIT INI untuk ganti branding/warna
 │   └── screens/
 │       ├── home_screen.dart
 │       └── karaoke_screen.dart
@@ -147,7 +150,7 @@ adb install app-release.apk
 
 | Error | Solusi |
 |-------|--------|
-| `assets/logo.png not found` | Pastikan file logo.png ada di folder `assets/` |
+| `logo.png not found di root repo` | Pastikan file logo.png ada di ROOT repo (bukan di folder assets/) |
 | `SDK version` error | Sudah dikonfigurasi, coba push ulang |
 | `pubspec.yaml` error | Periksa format file, tidak boleh ada tab |
 
@@ -174,7 +177,7 @@ Jika ingin update tampilan/fitur:
 | `pubspec.yaml` | Konfigurasi & dependencies |
 | `android/app/src/main/AndroidManifest.xml` | Izin & konfigurasi Android |
 | `.github/workflows/build.yml` | Script build otomatis |
-| `assets/logo.png` | Logo RaRa Cafe |
+| `logo.png` (root repo) | Logo brand, sumber untuk launcher icon juga |
 
 ---
 

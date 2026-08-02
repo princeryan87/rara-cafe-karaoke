@@ -21,8 +21,23 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  # Auto-generate launcher icon dari build_assets/*.png
+  # (di-generate oleh tool/generate_icon_source.py dari logo.png)
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
   uses-material-design: true
   assets:
-    - assets/logo.png
+    - logo.png
+
+# ── Konfigurasi flutter_launcher_icons ──
+# Dijalankan via: dart run flutter_launcher_icons
+# WAJIB jalankan tool/generate_icon_source.py dulu sebelum ini,
+# supaya file build_assets/*.png sudah ada (lihat .github/workflows/build.yml).
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: false
+  image_path: "build_assets/icon_legacy.png"
+  adaptive_icon_background: "#111111"
+  adaptive_icon_foreground: "build_assets/icon_adaptive_fg.png"
+  min_sdk_android: 21
