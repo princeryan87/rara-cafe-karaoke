@@ -74,6 +74,10 @@ rara-cafe-karaoke/
 ├── lib/
 │   ├── main.dart
 │   ├── config.dart           ← EDIT INI untuk ganti branding/warna
+│   ├── services/
+│   │   └── queue_service.dart
+│   ├── widgets/
+│   │   └── queue_dialog.dart
 │   └── screens/
 │       ├── home_screen.dart
 │       └── karaoke_screen.dart
@@ -167,13 +171,32 @@ Jika ingin update tampilan/fitur:
 
 ---
 
+## FITUR YANG SUDAH ADA
+
+| Fitur | Keterangan |
+|---|---|
+| Antrian lagu | Tombol "+ Tambah ke Antrian" muncul di halaman video. Buka daftar lewat tombol 🎵 Antrian di topbar. Auto-lanjut ke lagu berikutnya begitu video habis. Disimpan sementara (JSON), otomatis terhapus saat antrian habis. |
+| Domain-lock | WebView cuma bisa navigasi ke domain YouTube resmi (`lib/screens/karaoke_screen.dart` -> `_allowedDomains`) |
+| Adblock | Kombinasi: blokir `fetch`/`XHR` ke domain iklan dari dalam halaman, sembunyikan elemen "Sponsored", auto-skip tombol "Skip Ad". **Bukan** blokir level jaringan/OS (keterbatasan `webview_flutter`), jadi tidak akan 100% bersih dari iklan. |
+| Kiosk lock (Screen Pinning) | Layar otomatis terkunci ke app ini saat dibuka (tombol Home/Recents diblokir). Staf tetap bisa keluar lewat cara resmi Android (tahan Back+Recents) untuk maintenance. Lepas kunci otomatis saat tekan "Keluar". |
+| Background logo | Logo brand jadi background fullscreen (opacity 30%) di halaman utama |
+
+**Belum ada:** auto-start saat boot (sengaja ditunda dulu).
+
+---
+
 ## FILE PENTING
 
 | File | Fungsi |
 |------|--------|
-| `lib/main.dart` | Entry point app |
-| `lib/screens/home_screen.dart` | Halaman utama (logo, search, tombol) |
-| `lib/screens/karaoke_screen.dart` | Halaman WebView YouTube |
+| `lib/main.dart` | Entry point app, aktifkan kiosk lock |
+| `lib/config.dart` | **Edit ini untuk ganti branding/warna** |
+| `lib/services/queue_service.dart` | Simpan/baca antrian lagu |
+| `lib/services/kiosk_service.dart` | Jembatan ke Screen Pinning native |
+| `lib/widgets/queue_dialog.dart` | Tampilan dialog antrian |
+| `lib/screens/home_screen.dart` | Halaman utama (logo background, search, tombol) |
+| `lib/screens/karaoke_screen.dart` | Halaman WebView YouTube + domain-lock + adblock + antrian |
+| `android/app/src/main/kotlin/.../MainActivity.kt` | Kode native kiosk (Screen Pinning) |
 | `pubspec.yaml` | Konfigurasi & dependencies |
 | `android/app/src/main/AndroidManifest.xml` | Izin & konfigurasi Android |
 | `.github/workflows/build.yml` | Script build otomatis |

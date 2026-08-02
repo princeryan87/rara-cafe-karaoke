@@ -16,6 +16,8 @@ dependencies:
   device_info_plus: ^9.1.2
   # Wakelock agar layar tidak mati saat karaoke
   wakelock_plus: ^1.1.4
+  # Simpan file antrian (JSON sementara, bukan database)
+  path_provider: ^2.1.2
 
 dev_dependencies:
   flutter_test:

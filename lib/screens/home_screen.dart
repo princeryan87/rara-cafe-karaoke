@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../config.dart';
+import '../services/queue_service.dart';
+import '../services/kiosk_service.dart';
+import '../widgets/queue_dialog.dart';
 import 'karaoke_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,6 +17,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   late AnimationController _glowController;
   late Animation<double> _glowAnimation;
+  int _queueCount = 0;
 
   // Warna tema -- sumbernya dari config.dart, JANGAN edit di sini.
   // Ganti branding/warna lewat lib/config.dart.
@@ -45,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    _refreshQueueCount();
     _glowController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
@@ -52,6 +57,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _glowAnimation = Tween<double>(begin: 0.4, end: 1.0).animate(
       CurvedAnimation(parent: _glowController, curve: Curves.easeInOut),
     );
+  }
+
+  Future<void> _refreshQueueCount() async {
+    final queue = await QueueService.getQueue();
+    if (!mounted) return;
+    setState(() => _queueCount = queue.length);
+  }
+
+  void _openQueueDialog() {
+    showQueueDialog(
+      context,
+      onPlay: (item) => _openKaraoke(item.url),
+    ).then((_) => _refreshQueueCount());
   }
 
   @override
@@ -65,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => KaraokeScreen(url: url)),
-    );
+    ).then((_) => _refreshQueueCount());
   }
 
   void _doSearch() {
@@ -110,8 +128,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Keluar App (Android tidak bisa shutdown langsung)
-                  _powerBtn('🔴', 'Keluar', const Color(0xFFDC2626), () {
+                  _powerBtn('🔴', 'Keluar', const Color(0xFFDC2626), () async {
                     Navigator.pop(context);
+                    await KioskService.stopKiosk();
                     SystemNavigator.pop(); // Keluar dari app
                   }),
                   const SizedBox(width: 12),
@@ -156,29 +175,46 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     return Scaffold(
       backgroundColor: dark,
-      body: Column(
+      body: Stack(
         children: [
-          // ── TOP BAR ──
-          _buildTopBar(isTV),
-
-          // ── HOME CONTENT ──
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  const SizedBox(height: 20),
-                  // Logo tengah
-                  _buildCenterLogo(isTV),
-                  const SizedBox(height: 28),
-                  // Quick buttons
-                  _buildQuickButtons(isTV),
-                  const SizedBox(height: 20),
-                  // Tag cloud
-                  _buildTagCloud(isTV),
-                  const SizedBox(height: 30),
-                ],
+          // ── Logo background fullscreen (cover, opacity 30%) ──
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.3,
+              child: Image.asset(
+                AppConfig.logoAssetPath,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
               ),
             ),
+          ),
+
+          // ── Konten utama (di atas background) ──
+          Column(
+            children: [
+              // ── TOP BAR ──
+              _buildTopBar(isTV),
+
+              // ── HOME CONTENT ──
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      // Branding tengah
+                      _buildCenterLogo(isTV),
+                      const SizedBox(height: 28),
+                      // Quick buttons
+                      _buildQuickButtons(isTV),
+                      const SizedBox(height: 20),
+                      // Tag cloud
+                      _buildTagCloud(isTV),
+                      const SizedBox(height: 30),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -188,11 +224,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget _buildTopBar(bool isTV) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: isTV ? 10 : 8),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF1C0800), Color(0xFF111111)],
-        ),
-        border: Border(bottom: BorderSide(color: Color(0xFFE85D00), width: 2)),
+      decoration: BoxDecoration(
+        color: const Color(0xFF140A05).withOpacity(0.5),
+        border: const Border(bottom: BorderSide(color: Color(0xFFE85D00), width: 2)),
       ),
       child: Row(
         children: [
@@ -291,6 +325,46 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: _navPill(btn['label']!, btn['url']!, isTV),
           )),
 
+          const SizedBox(width: 6),
+
+          // Tombol antrian
+          GestureDetector(
+            onTap: _openQueueDialog,
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: isTV ? 14 : 10,
+                vertical: isTV ? 8 : 6,
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: orange, width: 1.5),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('🎵 Antrian',
+                    style: TextStyle(
+                      color: orange,
+                      fontSize: isTV ? 13 : 11,
+                      fontWeight: FontWeight.w600,
+                    )),
+                  if (_queueCount > 0) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: orangeLight,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text('$_queueCount',
+                        style: const TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+
           const SizedBox(width: 10),
 
           // Power button
@@ -336,42 +410,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildCenterLogo(bool isTV) {
-    final logoSize = isTV ? 160.0 : 120.0;
     return AnimatedBuilder(
       animation: _glowAnimation,
       builder: (_, child) {
         return Column(
           children: [
-            Container(
-              width: logoSize,
-              height: logoSize,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: orange.withOpacity(_glowAnimation.value * 0.6),
-                    blurRadius: 50,
-                    spreadRadius: 10,
-                  ),
-                  BoxShadow(
-                    color: orangeLight.withOpacity(_glowAnimation.value * 0.3),
-                    blurRadius: 80,
-                    spreadRadius: 20,
-                  ),
-                ],
-              ),
-              child: ClipOval(
-                child: Image.asset(AppConfig.logoAssetPath,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    color: darkOrange,
-                    child: Icon(Icons.local_cafe,
-                      color: orange, size: logoSize * 0.6),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 8),
             RichText(
               textAlign: TextAlign.center,
               text: TextSpan(

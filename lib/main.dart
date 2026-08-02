@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'config.dart';
+import 'services/kiosk_service.dart';
 import 'screens/home_screen.dart';
 
 void main() async {
@@ -18,6 +19,10 @@ void main() async {
 
   // Layar tidak mati saat karaoke
   await WakelockPlus.enable();
+
+  // Kunci layar ke app ini saja (Screen Pinning) -- lihat catatan
+  // batasan di kiosk_service.dart / MainActivity.kt
+  await KioskService.startKiosk();
 
   runApp(const RaraCafeKaraokeApp());
 }
