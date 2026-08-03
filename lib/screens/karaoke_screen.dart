@@ -116,9 +116,42 @@ class _KaraokeScreenState extends State<KaraokeScreen> {
         "ytd-banner-promo-renderer,ytd-mealbar-promo-renderer,ytd-merch-shelf-renderer," +
         "ytd-primetime-promo-renderer,ytm-companion-ad-renderer,#masthead-ad," +
         "#player-ads,.ytp-ad-player-overlay,.ytp-ad-player-overlay-instream-info," +
+        "[class*=\"shopping\" i],[id*=\"shopping\" i],.ytp-suggested-action," +
+        ".ytp-visit-advertiser-link,.ytp-suggestion-set," +
         "[class*=\"ytp-ad-\"]:not(.ytp-ad-skip-button):not(.ytp-ad-skip-button-modern):not(.ytp-skip-ad-button)" +
         "{display:none !important;}";
       (document.head || document.documentElement).appendChild(style);
+    } catch (e) {}
+  }
+
+  // ── Sembunyikan dialog/overlay promosi berdasarkan TEKS ──
+  // Nama class elemen promo YouTube (mis. "Music discovery made easy",
+  // "View products") sering berubah-ubah, jadi lebih tahan lama kalau
+  // dideteksi dari isi teksnya, bukan cuma nama class/tag.
+  var PROMO_PHRASES = [
+    "Music discovery made easy",
+    "View products",
+    "Check it out",
+    "YouTube Music",
+    "Try YouTube Premium",
+    "No thanks"
+  ];
+  function hidePromoByText() {
+    try {
+      var candidates = document.querySelectorAll(
+        'tp-yt-paper-dialog, ytd-popup-container, [role="dialog"], ytd-mealbar-promo-renderer, ' +
+        '.ytp-suggested-action, .ytp-ce-element, [class*="shopping" i]'
+      );
+      for (var i = 0; i < candidates.length; i++) {
+        var el = candidates[i];
+        var text = el.textContent || "";
+        for (var j = 0; j < PROMO_PHRASES.length; j++) {
+          if (text.indexOf(PROMO_PHRASES[j]) !== -1) {
+            el.style.display = "none";
+            break;
+          }
+        }
+      }
     } catch (e) {}
   }
 
@@ -206,6 +239,7 @@ class _KaraokeScreenState extends State<KaraokeScreen> {
   setInterval(hideYoutubeTopbar, 500);
   setInterval(hideAdElements, 1000);
   setInterval(autoSkipAds, 800);
+  setInterval(hidePromoByText, 1000);
 
   hideYoutubeTopbar();
   hideAdElements();
@@ -317,7 +351,7 @@ class _KaraokeScreenState extends State<KaraokeScreen> {
           // ── Mini top bar saat di halaman video ──
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            color: const Color(0xFF1C0800),
+            color: AppConfig.darkOrange,
             child: Row(
               children: [
                 // Tombol kembali
@@ -343,7 +377,7 @@ class _KaraokeScreenState extends State<KaraokeScreen> {
                     height: 34,
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF0D0D0D),
+                      color: AppConfig.searchBoxBg,
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(color: orange.withOpacity(0.6), width: 1.2),
                     ),
@@ -434,7 +468,7 @@ class _KaraokeScreenState extends State<KaraokeScreen> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF1A1A1A),
+                              color: AppConfig.darkCard,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(color: Colors.grey.shade700),
                             ),

@@ -105,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF1C0800), Color(0xFF111111)],
+              colors: [AppConfig.darkOrange, AppConfig.dark],
             ),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: orange, width: 2),
@@ -128,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Keluar App (Android tidak bisa shutdown langsung)
-                  _powerBtn('🔴', 'Keluar', const Color(0xFFDC2626), () async {
+                  _powerBtn('🔴', 'Keluar', AppConfig.danger, () async {
                     Navigator.pop(context);
                     await KioskService.stopKiosk();
                     SystemNavigator.pop(); // Keluar dari app
@@ -239,8 +239,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: isTV ? 10 : 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF140A05).withOpacity(0.5),
-        border: const Border(bottom: BorderSide(color: Color(0xFFE85D00), width: 2)),
+        color: AppConfig.topbarBase.withOpacity(0.5),
+        border: const Border(bottom: BorderSide(color: AppConfig.orange, width: 2)),
       ),
       child: Row(
         children: [
@@ -287,7 +287,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: Container(
               height: isTV ? 44 : 38,
               decoration: BoxDecoration(
-                color: const Color(0xFF1C0800),
+                color: AppConfig.darkOrange,
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(color: orange, width: 1.5),
               ),
@@ -297,11 +297,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     child: TextField(
                       controller: _searchController,
                       style: const TextStyle(color: Colors.white, fontSize: 14),
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Cari lagu karaoke...',
-                        hintStyle: TextStyle(color: Color(0x66C2A06A)),
+                        hintStyle: TextStyle(color: AppConfig.gold.withOpacity(0.4)),
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       ),
                       onSubmitted: (_) => _doSearch(),
                     ),
@@ -313,7 +313,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [Color(0xFFE85D00), Color(0xFFFF8C00)],
+                          colors: [AppConfig.orange, AppConfig.orangeLight],
                         ),
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -402,7 +402,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: Container(
               width: 38, height: 38,
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A),
+                color: AppConfig.darkCard,
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.grey.shade700, width: 2),
               ),
@@ -510,7 +510,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
             decoration: BoxDecoration(
               gradient: isPrimary
-                ? const LinearGradient(colors: [Color(0xFFE85D00), Color(0xFFFF8C00)])
+                ? const LinearGradient(colors: [AppConfig.orange, AppConfig.orangeLight])
                 : null,
               color: isPrimary ? null : darkCard,
               borderRadius: BorderRadius.circular(30),

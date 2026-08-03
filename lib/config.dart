@@ -28,6 +28,9 @@ class AppConfig {
   static const Color dark = Color(0xFF111111);
   static const Color darkCard = Color(0xFF1A1A1A);
   static const Color darkOrange = Color(0xFF1C0800);
+  static const Color danger = Color(0xFFDC2626);       // tombol "Keluar"
+  static const Color topbarBase = Color(0xFF140A05);   // dasar topbar semi-transparan
+  static const Color searchBoxBg = Color(0xFF0D0D0D);  // background search box
 
   // Judul lengkap (dipakai untuk MaterialApp title & topbar)
   static String get fullTitle => '$brandName $subBrand';
