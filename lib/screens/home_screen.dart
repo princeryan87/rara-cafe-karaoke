@@ -196,21 +196,35 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               _buildTopBar(isTV),
 
               // ── HOME CONTENT ──
+              // FittedBox (bukan scroll) -- seluruh konten didesain di
+              // lebar acuan 900, lalu otomatis di-scale mengecil kalau
+              // ruang layar lebih kecil (HP landscape kecil) supaya
+              // SELALU pas dalam satu layar, tidak pernah kepotong dan
+              // tidak pernah perlu digeser/scroll. Di layar besar (TV)
+              // otomatis tidak diperbesar berlebihan (scaleDown = hanya
+              // mengecil, tidak pernah membesar melebihi ukuran asli).
               Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 20),
-                      // Branding tengah
-                      _buildCenterLogo(isTV),
-                      const SizedBox(height: 28),
-                      // Quick buttons
-                      _buildQuickButtons(isTV),
-                      const SizedBox(height: 20),
-                      // Tag cloud
-                      _buildTagCloud(isTV),
-                      const SizedBox(height: 30),
-                    ],
+                child: Center(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: SizedBox(
+                      width: 900,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(height: 20),
+                          // Branding tengah
+                          _buildCenterLogo(isTV),
+                          const SizedBox(height: 28),
+                          // Quick buttons
+                          _buildQuickButtons(isTV),
+                          const SizedBox(height: 20),
+                          // Tag cloud
+                          _buildTagCloud(isTV),
+                          const SizedBox(height: 20),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -269,6 +283,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
           // Search bar
           Expanded(
+            flex: 2,
             child: Container(
               height: isTV ? 44 : 38,
               decoration: BoxDecoration(
@@ -319,47 +334,60 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
           const SizedBox(width: 10),
 
-          // Nav pills
-          ..._navButtons.map((btn) => Padding(
-            padding: const EdgeInsets.only(left: 6),
-            child: _navPill(btn['label']!, btn['url']!, isTV),
-          )),
-
-          const SizedBox(width: 6),
-
-          // Tombol antrian
-          GestureDetector(
-            onTap: _openQueueDialog,
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: isTV ? 14 : 10,
-                vertical: isTV ? 8 : 6,
-              ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: orange, width: 1.5),
-              ),
+          // Nav pills + Antrian -- dibungkus Flexible+FittedBox supaya
+          // TIDAK PERNAH ke-clip/hilang di layar sempit (HP landscape).
+          // Kalau tidak cukup ruang, semuanya otomatis mengecil bareng,
+          // BUKAN kepotong keluar layar.
+          Flexible(
+            flex: 3,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerRight,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('🎵 Antrian',
-                    style: TextStyle(
-                      color: orange,
-                      fontSize: isTV ? 13 : 11,
-                      fontWeight: FontWeight.w600,
-                    )),
-                  if (_queueCount > 0) ...[
-                    const SizedBox(width: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                      decoration: BoxDecoration(
-                        color: orangeLight,
-                        borderRadius: BorderRadius.circular(10),
+                  ..._navButtons.map((btn) => Padding(
+                    padding: const EdgeInsets.only(left: 6),
+                    child: _navPill(btn['label']!, btn['url']!, isTV),
+                  )),
+                  const SizedBox(width: 6),
+                  // Tombol antrian
+                  GestureDetector(
+                    onTap: _openQueueDialog,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isTV ? 14 : 10,
+                        vertical: isTV ? 8 : 6,
                       ),
-                      child: Text('$_queueCount',
-                        style: const TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold)),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: orange, width: 1.5),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('🎵 Antrian',
+                            style: TextStyle(
+                              color: orange,
+                              fontSize: isTV ? 13 : 11,
+                              fontWeight: FontWeight.w600,
+                            )),
+                          if (_queueCount > 0) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: orangeLight,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text('$_queueCount',
+                                style: const TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold)),
+                            ),
+                          ],
+                        ],
+                      ),
                     ),
-                  ],
+                  ),
                 ],
               ),
             ),
@@ -367,7 +395,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
           const SizedBox(width: 10),
 
-          // Power button
+          // Power button -- SENGAJA di luar FittedBox, selalu ukuran
+          // penuh & mudah dipencet (kontrol paling penting).
           GestureDetector(
             onTap: _showPowerDialog,
             child: Container(
