@@ -10,13 +10,13 @@ import 'package:flutter/material.dart';
 
 class AppConfig {
   // Nama usaha / brand. Contoh: "RaRa Cafe", "Prince Entertainment"
-  static const String brandName = 'RaRa Cafe';
+  static const String brandName = 'AZRA';
 
   // Sub-judul di bawah nama brand
   static const String subBrand = 'Karaoke';
 
   // Tagline kecil di layar utama
-  static const String tagline = '✦ Nyanyikan Hati Anda ✦';
+  static const String tagline = '✦ MARI BERGEMBIRA ✦';
 
   // Path logo -- HARUS sama dengan nama file di root repo (logo.png)
   static const String logoAssetPath = 'logo.png';
