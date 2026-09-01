@@ -1,4 +1,4 @@
-name: Build RaRa Cafe Karaoke APK
+name: Build Azra Karaoke APK
 
 on:
   # Otomatis build setiap kali ada perubahan di GitHub
