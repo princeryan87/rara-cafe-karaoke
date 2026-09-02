@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Ganti nilai ini untuk mengubah nama di launcher Android/TV -->
+    <string name="app_name">AZRA Karaoke</string>
+</resources>
