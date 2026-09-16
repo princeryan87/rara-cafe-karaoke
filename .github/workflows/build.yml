@@ -25,6 +25,9 @@ jobs:
       - name: Generate icon source dari logo.png
         run: python3 tool/generate_icon_source.py
 
+      - name: Sinkronkan nama launcher dari config.dart
+        run: python3 tool/generate_strings.py
+
       - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
