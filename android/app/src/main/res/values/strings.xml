@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Ganti nilai ini untuk mengubah nama di launcher Android/TV -->
+    <!-- File ini digenerate otomatis oleh tool/generate_strings.py -->
+    <!-- Sumber nilai: lib/config.dart (brandName + subBrand) -->
     <string name="app_name">AZRA Karaoke</string>
 </resources>

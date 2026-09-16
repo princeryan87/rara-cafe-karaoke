@@ -10,10 +10,10 @@ import 'package:flutter/material.dart';
 
 class AppConfig {
   // Nama usaha / brand. Contoh: "RaRa Cafe", "Prince Entertainment"
-  static const String brandName = 'AZRA';
+  static const String brandName = 'Prince';
 
   // Sub-judul di bawah nama brand
-  static const String subBrand = 'Karaoke';
+  static const String subBrand = 'Entertainment';
 
   // Tagline kecil di layar utama
   static const String tagline = '✦ MARI BERGEMBIRA ✦';
