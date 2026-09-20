@@ -57,14 +57,29 @@ jobs:
       - name: Build APK universal
         run: flutter build apk --release
 
-      # Debug: tampilkan semua APK yang ditemukan
       - name: List APK output
         run: find . -name "*.apk" -not -path "*/intermediates/*"
+
+      # Baca brandName dari config.dart untuk nama artifact
+      - name: Get brand name
+        id: brand
+        run: |
+          python3 - << 'PYEOF'
+          import re, os
+          with open('lib/config.dart', 'r') as f:
+              content = f.read()
+          brand = re.search(r"brandName\s*=\s*'([^']+)'", content)
+          sub = re.search(r"subBrand\s*=\s*'([^']+)'", content)
+          name = ((brand.group(1) if brand else '') + '-' + (sub.group(1) if sub else '')).strip('-').replace(' ', '-')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write(f'brand_name={name}\n')
+          print(f'Brand: {name}')
+          PYEOF
 
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Karaoke-APK
+          name: ${{ steps.brand.outputs.brand_name }}-Android-APK
           path: |
             build/app/outputs/flutter-apk/app-release.apk
             build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
