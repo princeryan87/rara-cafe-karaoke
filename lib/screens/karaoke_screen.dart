@@ -53,35 +53,7 @@ class _KaraokeScreenState extends State<KaraokeScreen> {
   if (window.__raraInjected) return;
   window.__raraInjected = true;
 
-  // ── Adblock: blokir fetch()/XHR ke domain iklan dari DALAM halaman ──
-  // Bukan blokir level jaringan/OS (webview_flutter tidak menyediakan hook
-  // ke situ tanpa fork plugin) -- ini "monkey-patch" fetch & XHR milik
-  // JAVASCRIPT HALAMAN ITU SENDIRI, jadi permintaan ke domain iklan gagal
-  // SEBELUM sempat dikirim. Tidak 100% (request lewat <script src> atau
-  // <iframe src> langsung tidak tertangkap), makanya dikombinasi CSS
-  // hiding + auto-skip di bawah.
-  var AD_DOMAINS = [
-    "doubleclick.net", "googlesyndication.com", "googleadservices.com",
-    "google-analytics.com", "adservice.google.com", "imasdk.googleapis.com",
-    "googleads.g.doubleclick.net", "static.doubleclick.net"
-  ];
-  function isAdUrl(url) {
-    if (!url) return false;
-    return AD_DOMAINS.some(function (d) { return url.indexOf(d) !== -1; });
-  }
-  try {
-    var originalFetch = window.fetch;
-    window.fetch = function (input) {
-      var url = typeof input === "string" ? input : (input && input.url) || "";
-      if (isAdUrl(url)) return Promise.reject(new Error("blocked-by-adblock"));
-      return originalFetch.apply(this, arguments);
-    };
-    var originalOpen = XMLHttpRequest.prototype.open;
-    XMLHttpRequest.prototype.open = function (method, url) {
-      if (isAdUrl(url)) throw new Error("blocked-by-adblock");
-      return originalOpen.apply(this, arguments);
-    };
-  } catch (e) {}
+  // Adblock via fetch/XHR dihapus — CSS-only (aman dari deteksi YouTube)
 
   // ── Sembunyikan topbar YouTube (logo, search box, sign-in) ──
   // Supaya yang terlihat cuma topbar aplikasi kita. Dibuat tahan-banting
@@ -255,10 +227,10 @@ class _KaraokeScreenState extends State<KaraokeScreen> {
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setUserAgent(
-        // User agent desktop agar YouTube tampil versi penuh
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+        // UA Chrome Android — natural untuk WebView di Android & TV
+        'Mozilla/5.0 (Linux; Android 13; Pixel 7) '
         'AppleWebKit/537.36 (KHTML, like Gecko) '
-        'Chrome/120.0.0.0 Safari/537.36',
+        'Chrome/120.0.6099.230 Mobile Safari/537.36',
       )
       ..addJavaScriptChannel(
         'RaraQueueBridge',

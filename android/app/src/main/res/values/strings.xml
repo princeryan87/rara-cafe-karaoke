@@ -2,5 +2,5 @@
 <resources>
     <!-- File ini digenerate otomatis oleh tool/generate_strings.py -->
     <!-- Sumber nilai: lib/config.dart (brandName + subBrand) -->
-    <string name="app_name">AZRA Karaoke</string>
+    <string name="app_name">Prince Entertainment</string>
 </resources>
