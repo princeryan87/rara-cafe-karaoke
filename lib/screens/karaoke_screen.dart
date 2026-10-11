@@ -53,73 +53,136 @@ class _KaraokeScreenState extends State<KaraokeScreen> {
   if (window.__raraInjected) return;
   window.__raraInjected = true;
 
-  // Adblock via fetch/XHR dihapus — CSS-only (aman dari deteksi YouTube)
-
-  // ── Sembunyikan topbar YouTube (logo, search box, sign-in) ──
-  // Supaya yang terlihat cuma topbar aplikasi kita. Dibuat tahan-banting
-  // (try/catch + dicoba berkala) -- kalau document belum siap saat
-  // dipanggil pertama kali, dicoba lagi di tick interval berikutnya.
-  function hideYoutubeTopbar() {
+  // ══════════════════════════════════════════════════════════
+  //  CSS INJECTION — YouTube Mobile UI Cleanup
+  //  Menyembunyikan elemen UI YouTube yang tidak dibutuhkan
+  //  di tampilan karaoke. CSS-only = aman dari deteksi.
+  // ══════════════════════════════════════════════════════════
+  function injectCleanupStyles() {
     try {
-      if (document.getElementById("__rara_hide_topbar_style__")) return;
+      if (document.getElementById("__rara_cleanup__")) return;
       if (!document.head && !document.documentElement) return;
-      var style = document.createElement("style");
-      style.id = "__rara_hide_topbar_style__";
-      style.textContent =
-        "ytd-masthead,#masthead-container,tp-yt-app-header#header{display:none !important;}" +
-        "html{--ytd-masthead-height:0px !important;}" +
-        "ytd-app,#page-manager,ytd-page-manager{margin-top:0 !important;padding-top:0 !important;}";
-      (document.head || document.documentElement).appendChild(style);
+      var s = document.createElement("style");
+      s.id = "__rara_cleanup__";
+      s.textContent = [
+
+        // ── YouTube Mobile: sembunyikan header/search bar ──
+        // ytm = YouTube Mobile web elements
+        "ytm-mobile-topbar-renderer,",
+        "#header,",
+        ".mobile-topbar-header,",
+        "header.mobile-topbar-header,",
+        ".topbar-logo-badge,",
+        "ytm-searchbox,",
+        ".searchbox,",
+        "#search-input-form,",
+
+        // ── YouTube Desktop: sembunyikan masthead ──
+        "ytd-masthead,",
+        "#masthead-container,",
+        "tp-yt-app-header#header,",
+
+        // ── YouTube Mobile: sembunyikan navbar bawah ──
+        "ytm-pivot-bar-renderer,",
+        ".pivot-bar-container,",
+        "ytm-bottom-bar-renderer,",
+        ".bottom-bar,",
+        "ytm-app>nav,",
+        "nav.pivot-bar-container,",
+
+        // ── YouTube Mobile: sembunyikan tombol mic & filter ──
+        ".searchbox-voice-button,",
+        "ytm-button-renderer.searchbox-voice-button,",
+        "ytm-chip-cloud-renderer,",
+        ".chip-cloud,",
+
+        // ── YouTube Mobile: sembunyikan elemen iklan ──
+        "ytm-companion-ad-renderer,",
+        "ytm-promoted-sparkles-renderer,",
+        "ytm-promoted-video-renderer,",
+        "ytm-banner-promo-renderer,",
+        "ytm-statement-banner-renderer,",
+        ".companion-ad-container,",
+
+        // ── YouTube Desktop: sembunyikan iklan display ──
+        "ytd-display-ad-renderer,",
+        "ytd-promoted-sparkles-web-renderer,",
+        "ytd-promoted-video-renderer,",
+        "ytd-in-feed-ad-layout-renderer,",
+        "ytd-ad-slot-renderer,",
+        "#masthead-ad,",
+
+        // ── Sembunyikan player ads overlay ──
+        ".ytp-ad-player-overlay,",
+        ".ytp-ad-player-overlay-instream-info,",
+        ".ytp-ad-image-overlay,",
+        ".ytp-ad-text-overlay,",
+        ".ytp-suggested-action,",
+        ".ytp-visit-advertiser-link,",
+
+        // ── Sembunyikan merch, promo, shorts shelf ──
+        "ytm-merch-shelf-renderer,",
+        "ytd-merch-shelf-renderer,",
+        "ytm-reel-shelf-renderer,",
+        "ytd-reel-shelf-renderer,",
+
+        // ── Fix: hapus margin/padding akibat elemen disembunyikan ──
+        // Mobile
+        "ytm-app { padding-top: 0 !important; }",
+        ".page-container { padding-top: 0 !important; }",
+        // Desktop
+        "ytd-app,#page-manager { margin-top: 0 !important; padding-top: 0 !important; }",
+        "html { --ytd-masthead-height: 0px !important; }"
+
+      ].join("") + " { display: none !important; }";
+
+      // Append terakhir supaya override semua style YouTube
+      (document.head || document.documentElement).appendChild(s);
     } catch (e) {}
   }
 
-  // ── Sembunyikan elemen "Sponsored" / iklan tampilan ──
-  function hideAdElements() {
+  // ── Auto-klik tombol Skip Ad ──
+  // Klik tombol yang disediakan YouTube sendiri = tidak melanggar ToS.
+  function autoSkipAds() {
     try {
-      if (document.getElementById("__rara_adblock_style__")) return;
-      if (!document.head && !document.documentElement) return;
-      var style = document.createElement("style");
-      style.id = "__rara_adblock_style__";
-      style.textContent =
-        "ytd-display-ad-renderer,ytd-promoted-sparkles-web-renderer," +
-        "ytd-promoted-video-renderer,ytd-in-feed-ad-layout-renderer," +
-        "ytd-ad-slot-renderer,ytd-companion-slot-renderer," +
-        "ytd-action-companion-ad-renderer,ytd-statement-banner-renderer," +
-        "ytd-banner-promo-renderer,ytd-mealbar-promo-renderer,ytd-merch-shelf-renderer," +
-        "ytd-primetime-promo-renderer,ytm-companion-ad-renderer,#masthead-ad," +
-        "#player-ads,.ytp-ad-player-overlay,.ytp-ad-player-overlay-instream-info," +
-        "[class*=\"shopping\" i],[id*=\"shopping\" i],.ytp-suggested-action," +
-        ".ytp-visit-advertiser-link,.ytp-suggestion-set," +
-        "[class*=\"ytp-ad-\"]:not(.ytp-ad-skip-button):not(.ytp-ad-skip-button-modern):not(.ytp-skip-ad-button)" +
-        "{display:none !important;}";
-      (document.head || document.documentElement).appendChild(style);
-    } catch (e) {}
-  }
-
-  // ── Sembunyikan dialog/overlay promosi berdasarkan TEKS ──
-  // Nama class elemen promo YouTube (mis. "Music discovery made easy",
-  // "View products") sering berubah-ubah, jadi lebih tahan lama kalau
-  // dideteksi dari isi teksnya, bukan cuma nama class/tag.
-  var PROMO_PHRASES = [
-    "Music discovery made easy",
-    "View products",
-    "Check it out",
-    "YouTube Music",
-    "Try YouTube Premium",
-    "No thanks"
-  ];
-  function hidePromoByText() {
-    try {
-      var candidates = document.querySelectorAll(
-        'tp-yt-paper-dialog, ytd-popup-container, [role="dialog"], ytd-mealbar-promo-renderer, ' +
-        '.ytp-suggested-action, .ytp-ce-element, [class*="shopping" i]'
+      var skipSelectors = [
+        ".ytp-ad-skip-button",
+        ".ytp-skip-ad-button",
+        ".ytp-ad-skip-button-modern",
+        ".ytp-ad-skip-button-container button",
+        // Mobile
+        ".skip-button",
+        "ytm-skip-button-renderer button",
+      ];
+      for (var i = 0; i < skipSelectors.length; i++) {
+        var btn = document.querySelector(skipSelectors[i]);
+        if (btn) { btn.click(); break; }
+      }
+      // Tutup overlay iklan
+      var overlayClose = document.querySelector(
+        ".ytp-ad-overlay-close-button, .ytp-ad-feedback-dialog-container button"
       );
-      for (var i = 0; i < candidates.length; i++) {
-        var el = candidates[i];
-        var text = el.textContent || "";
-        for (var j = 0; j < PROMO_PHRASES.length; j++) {
-          if (text.indexOf(PROMO_PHRASES[j]) !== -1) {
-            el.style.display = "none";
+      if (overlayClose) overlayClose.click();
+    } catch (e) {}
+  }
+
+  // ── Sembunyikan popup/dialog promosi berdasarkan teks ──
+  var PROMO_TEXTS = [
+    "YouTube Premium", "YouTube Music", "Try Premium",
+    "No thanks", "Music discovery", "Check it out"
+  ];
+  function hidePromoDialogs() {
+    try {
+      var els = document.querySelectorAll(
+        "tp-yt-paper-dialog, ytd-popup-container, [role='dialog'], " +
+        "ytm-mealbar-promo-renderer, .ytp-suggested-action, " +
+        "ytm-companion-ad-renderer"
+      );
+      for (var i = 0; i < els.length; i++) {
+        var text = els[i].textContent || "";
+        for (var j = 0; j < PROMO_TEXTS.length; j++) {
+          if (text.indexOf(PROMO_TEXTS[j]) !== -1) {
+            els[i].style.display = "none";
             break;
           }
         }
@@ -127,45 +190,31 @@ class _KaraokeScreenState extends State<KaraokeScreen> {
     } catch (e) {}
   }
 
-  // ── Auto-skip iklan video begitu tombol "Skip Ad" muncul ──
-  function autoSkipAds() {
-    try {
-      var skipBtn = document.querySelector(
-        ".ytp-ad-skip-button, .ytp-skip-ad-button, .ytp-ad-skip-button-modern, .ytp-ad-skip-button-container button"
-      );
-      if (skipBtn) skipBtn.click();
-      var overlayCloseBtn = document.querySelector(".ytp-ad-overlay-close-button, .ytp-ad-feedback-dialog-container button");
-      if (overlayCloseBtn) overlayCloseBtn.click();
-    } catch (e) {}
-  }
-
-  function isWatchPage() {
-    return location.pathname === "/watch";
-  }
+  // ── Tombol "+ Tambah ke Antrian" di halaman video ──
+  function isWatchPage() { return location.pathname === "/watch"; }
 
   function getVideoInfo() {
     var title = document.title.replace(/ - YouTube$/, "").trim();
     return { title: title || "Tanpa judul", url: location.href };
   }
 
-  // Tombol "+ Tambah ke Antrian" ditaruh di POJOK KANAN ATAS (bukan
-  // kanan bawah) -- supaya tidak menutupi tombol fullscreen / kontrol
-  // player YouTube yang selalu ada di bagian bawah, baik mode normal
-  // maupun fullscreen.
   function injectQueueButton() {
     try {
       if (document.getElementById("__rara_queue_btn__")) return;
       var btn = document.createElement("button");
       btn.id = "__rara_queue_btn__";
       btn.textContent = "+ Tambah ke Antrian";
-      btn.style.cssText = "position:fixed;top:16px;right:16px;z-index:999999;" +
+      btn.style.cssText =
+        "position:fixed;top:16px;right:16px;z-index:999999;" +
         "padding:10px 18px;border-radius:24px;border:none;" +
         "background:linear-gradient(135deg,#e85d00,#ff8c00);color:#111;" +
         "font-size:13px;font-weight:700;font-family:sans-serif;cursor:pointer;" +
-        "box-shadow:0 4px 16px rgba(232,93,0,0.6);opacity:0.92;";
+        "box-shadow:0 4px 16px rgba(232,93,0,0.6);";
       btn.addEventListener("click", function () {
         var info = getVideoInfo();
-        RaraQueueBridge.postMessage(JSON.stringify({ type: "add-to-queue", title: info.title, url: info.url }));
+        RaraQueueBridge.postMessage(
+          JSON.stringify({ type: "add-to-queue", title: info.title, url: info.url })
+        );
         btn.textContent = "✓ Ditambahkan";
         setTimeout(function () { btn.textContent = "+ Tambah ke Antrian"; }, 1500);
       });
@@ -196,25 +245,32 @@ class _KaraokeScreenState extends State<KaraokeScreen> {
     } catch (e) {}
   }
 
+  // ── SPA navigation listener (YouTube ganti halaman tanpa reload) ──
   var lastUrl = location.href;
   setInterval(function () {
     if (location.href !== lastUrl) {
       lastUrl = location.href;
-      setTimeout(checkAndInject, 800);
+      // Reset flag inject supaya CSS di-inject ulang di halaman baru
+      var old = document.getElementById("__rara_cleanup__");
+      if (old) old.remove();
+      window.__raraInjected = false;
+      setTimeout(function () {
+        injectCleanupStyles();
+        checkAndInject();
+      }, 600);
     }
   }, 500);
 
+  // ── Polling berkala ──
+  setInterval(injectCleanupStyles, 800);  // handle YouTube lazy-load
+  setInterval(autoSkipAds, 800);
+  setInterval(hidePromoDialogs, 1200);
   setInterval(function () {
     if (isWatchPage()) attachVideoEndedListener();
   }, 2000);
 
-  setInterval(hideYoutubeTopbar, 500);
-  setInterval(hideAdElements, 1000);
-  setInterval(autoSkipAds, 800);
-  setInterval(hidePromoByText, 1000);
-
-  hideYoutubeTopbar();
-  hideAdElements();
+  // ── Jalankan langsung ──
+  injectCleanupStyles();
   setTimeout(checkAndInject, 800);
 })();
 ''';
@@ -226,7 +282,7 @@ class _KaraokeScreenState extends State<KaraokeScreen> {
 
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setUserAgent(
+            ..setUserAgent(
         // UA Chrome Android — natural untuk WebView di Android & TV
         'Mozilla/5.0 (Linux; Android 13; Pixel 7) '
         'AppleWebKit/537.36 (KHTML, like Gecko) '
