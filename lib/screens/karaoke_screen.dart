@@ -55,8 +55,8 @@ class _KaraokeScreenState extends State<KaraokeScreen> {
 
   // ══════════════════════════════════════════════════════════
   //  CSS INJECTION — YouTube Mobile UI Cleanup
-  //  Menyembunyikan elemen UI YouTube yang tidak dibutuhkan
-  //  di tampilan karaoke. CSS-only = aman dari deteksi.
+  //  Satu blok CSS lengkap, tidak dipecah-pecah ke array.
+  //  CSS-only = aman dari deteksi YouTube.
   // ══════════════════════════════════════════════════════════
   function injectCleanupStyles() {
     try {
@@ -64,85 +64,83 @@ class _KaraokeScreenState extends State<KaraokeScreen> {
       if (!document.head && !document.documentElement) return;
       var s = document.createElement("style");
       s.id = "__rara_cleanup__";
-      s.textContent = [
+      s.textContent =
 
-        // ── YouTube Mobile: sembunyikan header/search bar ──
-        // ytm = YouTube Mobile web elements
-        "ytm-mobile-topbar-renderer,",
-        "#header,",
-        ".mobile-topbar-header,",
-        "header.mobile-topbar-header,",
-        ".topbar-logo-badge,",
-        "ytm-searchbox,",
-        ".searchbox,",
-        "#search-input-form,",
+        // ── YouTube Mobile: header & search bar ──
+        "ytm-mobile-topbar-renderer," +
+        "ytm-searchbox," +
+        ".mobile-topbar-header," +
+        "header.mobile-topbar-header," +
+        ".topbar-logo-badge," +
+        ".searchbox," +
+        "#search-input-form," +
 
-        // ── YouTube Desktop: sembunyikan masthead ──
-        "ytd-masthead,",
-        "#masthead-container,",
-        "tp-yt-app-header#header,",
+        // ── YouTube Mobile: navbar bawah (Home, Shorts, You) ──
+        "ytm-pivot-bar-renderer," +
+        "ytm-bottom-bar-renderer," +
+        ".pivot-bar-container," +
+        ".bottom-bar," +
+        "ytm-app > nav," +
+        "nav.pivot-bar-container," +
+        "ytm-app ytm-pivot-bar-renderer," +
 
-        // ── YouTube Mobile: sembunyikan navbar bawah ──
-        "ytm-pivot-bar-renderer,",
-        ".pivot-bar-container,",
-        "ytm-bottom-bar-renderer,",
-        ".bottom-bar,",
-        "ytm-app>nav,",
-        "nav.pivot-bar-container,",
+        // ── YouTube Mobile: chip filter & mic button ──
+        "ytm-chip-cloud-renderer," +
+        ".chip-cloud," +
+        ".searchbox-voice-button," +
+        "ytm-button-renderer.searchbox-voice-button," +
 
-        // ── YouTube Mobile: sembunyikan tombol mic & filter ──
-        ".searchbox-voice-button,",
-        "ytm-button-renderer.searchbox-voice-button,",
-        "ytm-chip-cloud-renderer,",
-        ".chip-cloud,",
+        // ── YouTube Mobile: iklan ──
+        "ytm-companion-ad-renderer," +
+        "ytm-promoted-sparkles-renderer," +
+        "ytm-promoted-video-renderer," +
+        "ytm-banner-promo-renderer," +
+        "ytm-statement-banner-renderer," +
+        ".companion-ad-container," +
+        "ytm-merch-shelf-renderer," +
+        "ytm-reel-shelf-renderer," +
 
-        // ── YouTube Mobile: sembunyikan elemen iklan ──
-        "ytm-companion-ad-renderer,",
-        "ytm-promoted-sparkles-renderer,",
-        "ytm-promoted-video-renderer,",
-        "ytm-banner-promo-renderer,",
-        "ytm-statement-banner-renderer,",
-        ".companion-ad-container,",
+        // ── YouTube Desktop: masthead ──
+        "ytd-masthead," +
+        "#masthead-container," +
+        "tp-yt-app-header#header," +
+        "#masthead-ad," +
 
-        // ── YouTube Desktop: sembunyikan iklan display ──
-        "ytd-display-ad-renderer,",
-        "ytd-promoted-sparkles-web-renderer,",
-        "ytd-promoted-video-renderer,",
-        "ytd-in-feed-ad-layout-renderer,",
-        "ytd-ad-slot-renderer,",
-        "#masthead-ad,",
+        // ── YouTube Desktop: iklan display ──
+        "ytd-display-ad-renderer," +
+        "ytd-promoted-sparkles-web-renderer," +
+        "ytd-promoted-video-renderer," +
+        "ytd-in-feed-ad-layout-renderer," +
+        "ytd-ad-slot-renderer," +
+        "ytd-merch-shelf-renderer," +
+        "ytd-reel-shelf-renderer," +
 
-        // ── Sembunyikan player ads overlay ──
-        ".ytp-ad-player-overlay,",
-        ".ytp-ad-player-overlay-instream-info,",
-        ".ytp-ad-image-overlay,",
-        ".ytp-ad-text-overlay,",
-        ".ytp-suggested-action,",
-        ".ytp-visit-advertiser-link,",
+        // ── Player ads overlay ──
+        ".ytp-ad-player-overlay," +
+        ".ytp-ad-player-overlay-instream-info," +
+        ".ytp-ad-image-overlay," +
+        ".ytp-ad-text-overlay," +
+        ".ytp-suggested-action," +
+        ".ytp-visit-advertiser-link" +
 
-        // ── Sembunyikan merch, promo, shorts shelf ──
-        "ytm-merch-shelf-renderer,",
-        "ytd-merch-shelf-renderer,",
-        "ytm-reel-shelf-renderer,",
-        "ytd-reel-shelf-renderer,",
+        // ── Tutup semua selector di atas ──
+        "{ display: none !important; }" +
 
-        // ── Fix: hapus margin/padding akibat elemen disembunyikan ──
-        // Mobile
-        "ytm-app { padding-top: 0 !important; }",
-        ".page-container { padding-top: 0 !important; }",
+        // ── Fix margin/padding setelah elemen disembunyikan ──
+        // Mobile: konten naik ke atas
+        "ytm-app { padding-top: 0 !important; }" +
+        ".page-container { padding-top: 0 !important; }" +
+        "ytm-app > .app-container { padding-top: 0 !important; }" +
+
         // Desktop
-        "ytd-app,#page-manager { margin-top: 0 !important; padding-top: 0 !important; }",
-        "html { --ytd-masthead-height: 0px !important; }"
+        "ytd-app, #page-manager, ytd-page-manager { margin-top: 0 !important; padding-top: 0 !important; }" +
+        "html { --ytd-masthead-height: 0px !important; }";
 
-      ].join("") + " { display: none !important; }";
-
-      // Append terakhir supaya override semua style YouTube
       (document.head || document.documentElement).appendChild(s);
     } catch (e) {}
   }
 
   // ── Auto-klik tombol Skip Ad ──
-  // Klik tombol yang disediakan YouTube sendiri = tidak melanggar ToS.
   function autoSkipAds() {
     try {
       var skipSelectors = [
@@ -150,40 +148,36 @@ class _KaraokeScreenState extends State<KaraokeScreen> {
         ".ytp-skip-ad-button",
         ".ytp-ad-skip-button-modern",
         ".ytp-ad-skip-button-container button",
-        // Mobile
         ".skip-button",
-        "ytm-skip-button-renderer button",
+        "ytm-skip-button-renderer button"
       ];
       for (var i = 0; i < skipSelectors.length; i++) {
         var btn = document.querySelector(skipSelectors[i]);
         if (btn) { btn.click(); break; }
       }
-      // Tutup overlay iklan
       var overlayClose = document.querySelector(
-        ".ytp-ad-overlay-close-button, .ytp-ad-feedback-dialog-container button"
+        ".ytp-ad-overlay-close-button,.ytp-ad-feedback-dialog-container button"
       );
       if (overlayClose) overlayClose.click();
     } catch (e) {}
   }
 
-  // ── Sembunyikan popup/dialog promosi berdasarkan teks ──
+  // ── Sembunyikan popup promosi berdasarkan teks ──
   var PROMO_TEXTS = [
-    "YouTube Premium", "YouTube Music", "Try Premium",
-    "No thanks", "Music discovery", "Check it out"
+    "YouTube Premium","YouTube Music","Try Premium",
+    "No thanks","Music discovery","Check it out"
   ];
   function hidePromoDialogs() {
     try {
       var els = document.querySelectorAll(
-        "tp-yt-paper-dialog, ytd-popup-container, [role='dialog'], " +
-        "ytm-mealbar-promo-renderer, .ytp-suggested-action, " +
-        "ytm-companion-ad-renderer"
+        "tp-yt-paper-dialog,ytd-popup-container,[role='dialog']," +
+        "ytm-mealbar-promo-renderer,.ytp-suggested-action,ytm-companion-ad-renderer"
       );
       for (var i = 0; i < els.length; i++) {
         var text = els[i].textContent || "";
         for (var j = 0; j < PROMO_TEXTS.length; j++) {
           if (text.indexOf(PROMO_TEXTS[j]) !== -1) {
-            els[i].style.display = "none";
-            break;
+            els[i].style.display = "none"; break;
           }
         }
       }
@@ -245,12 +239,11 @@ class _KaraokeScreenState extends State<KaraokeScreen> {
     } catch (e) {}
   }
 
-  // ── SPA navigation listener (YouTube ganti halaman tanpa reload) ──
+  // ── SPA navigation listener ──
   var lastUrl = location.href;
   setInterval(function () {
     if (location.href !== lastUrl) {
       lastUrl = location.href;
-      // Reset flag inject supaya CSS di-inject ulang di halaman baru
       var old = document.getElementById("__rara_cleanup__");
       if (old) old.remove();
       window.__raraInjected = false;
@@ -262,7 +255,7 @@ class _KaraokeScreenState extends State<KaraokeScreen> {
   }, 500);
 
   // ── Polling berkala ──
-  setInterval(injectCleanupStyles, 800);  // handle YouTube lazy-load
+  setInterval(injectCleanupStyles, 800);
   setInterval(autoSkipAds, 800);
   setInterval(hidePromoDialogs, 1200);
   setInterval(function () {
