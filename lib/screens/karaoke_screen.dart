@@ -331,13 +331,15 @@ class _KaraokeScreenState extends State<KaraokeScreen> {
       } else if (type == 'video-ended') {
         final queue = await QueueService.getQueue();
         if (queue.isNotEmpty) {
+          // Ada lagu berikutnya → putar otomatis
           final next = queue.first;
           await QueueService.removeAt(0);
           await _refreshQueueCount();
           _controller.loadRequest(Uri.parse(next.url));
+        } else {
+          // Antrian kosong → kembali ke home screen
+          if (mounted) Navigator.pop(context);
         }
-        // Kalau antrian kosong, biarkan YouTube lanjut normal (autoplay
-        // bawaan dia) -- sama seperti perilaku versi Windows.
       }
     } catch (_) {
       // Diamkan -- pesan tidak valid, tidak perlu crash aplikasi
